@@ -2,6 +2,7 @@ package ai.enpasos.mnist.blocks;
 
 import ai.djl.Model;
 import ai.djl.ndarray.types.Shape;
+import ai.djl.nn.Block;
 import ai.enpasos.onnx.GraphProto;
 import ai.enpasos.onnx.ModelProto;
 import ai.enpasos.onnx.OperatorSetIdProto;
@@ -22,13 +23,11 @@ public class OnnxIOExport {
 
 
     private static ModelProto getModelProto(Model model, List<Shape> inputShapes) {
-
-        OnnxIO onnxIO = (OnnxIO) model.getBlock();
-
-
-        OnnxBlock onnxBlock = onnxIO.getOnnxBlock(
-            OnnxCounter.builder().counter(0).build(),
-            combine(List.of("Input"), inputShapes)
+        Block block = model.getBlock();
+        OnnxConverter converter = OnnxConverter.getConverter(block);
+        OnnxBlock onnxBlock = converter.getOnnxBlock(block,
+                OnnxCounter.builder().counter(0).build(),
+                combine(List.of("Input"), inputShapes)
         );
 
         ModelProto.Builder modelBuilder = ModelProto.newBuilder();
@@ -49,7 +48,7 @@ public class OnnxIOExport {
         );
         graphBuilder.addAllValueInfo(onnxBlock.getValueInfos().stream()
                 .filter(vi -> !onnxBlock.getOutputNames().contains(vi.getName())
-                           && !onnxBlock.getInputNames().contains(vi.getName()))
+                        && !onnxBlock.getInputNames().contains(vi.getName()))
                 .collect(Collectors.toList())
         );
         graphBuilder.addAllOutput(onnxBlock.getValueInfos().stream()

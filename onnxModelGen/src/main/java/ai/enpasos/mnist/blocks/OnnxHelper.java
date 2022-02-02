@@ -31,14 +31,16 @@ public class OnnxHelper {
     public static List<Long> convert(long[] array) {
         return Arrays.asList(ArrayUtils.toObject(array));
     }
+
     public static List<Float> convert(float[] array) {
         return Arrays.asList(ArrayUtils.toObject(array));
     }
 
     public static List<ValueInfoProto> createValueInfoProto(List<OnnxTensor> output) {
-       return output.stream().map(t -> createValueInfoProto(t)).collect(Collectors.toList());
+        return output.stream().map(t -> createValueInfoProto(t)).collect(Collectors.toList());
 
     }
+
     public static ValueInfoProto createValueInfoProto(OnnxTensor output) {
         ValueInfoProto valueInfoProto = ValueInfoProto.newBuilder()
                 .setType(TypeProto.newBuilder()
